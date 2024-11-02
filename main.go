@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"akshayraichur.com/event-booking-go/db"
 	"akshayraichur.com/event-booking-go/models"
@@ -21,8 +22,10 @@ func main() {
 	})
 
 	server.GET("/events", getEvents)
-	server.POST("/events", createEvent)
+	server.GET("/events/:id", getEvent)
 
+	server.POST("/events", createEvent)
+	
 	server.Run(":8080") // listen and serve on
 
 }
@@ -64,5 +67,22 @@ func createEvent(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusCreated, gin.H{"status": "Event created successfully", "event": event})
+
+}
+
+
+func getEvent(context *gin.Context) {
+	eventID, err := strconv.ParseInt(context.Param("id"), 10, 64)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"message": "could not parse event id"})
+		return
+	}
+	
+	event, err := models.GetEventById(eventID)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "message": "Could not fetch an event"})
+		return
+	}
+	context.JSON(http.StatusOK, event)
 
 }

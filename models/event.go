@@ -32,7 +32,7 @@ func (event Event)Save() error {
 
 	defer stmt.Close() // close the statement after the function ends to free up resources 
 
-	result, error := stmt.Exec(event.Name, event.Description, event.Location, event.DateTime, event.UserID) // passing in the actual values
+	result, error := stmt.Exec(event.Name, event.Description, event.Location, event.DateTime, event.UserID) // passing in the actual values for the placeholders in the query
 	if error != nil {
 		return error
 	}
@@ -45,7 +45,27 @@ func (event Event)Save() error {
 	return nil
 }
 
-func GetAllEvents() []Event {
+func GetAllEvents() ([]Event, error) {
 	// get all events from database
-	return events
+
+	query := `SELECT * FROM events;`
+	rows, err := db.DB.Query(query) // query the database and get all the events from the events table
+	if err != nil {
+		return nil , err
+	}
+
+	defer rows.Close() // close the rows after the function ends to free up resources
+
+	events := []Event{}
+
+	for rows.Next() {
+		var event Event
+		err := rows.Scan(&event.ID, &event.Name, &event.Description, &event.Location, &event.DateTime, &event.UserID) // scan the rows and assign the values to the event struct, the order of the values should match the order of the columns in the query & pointer to the struct fields
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, event)
+	}
+
+	return events, nil
 }

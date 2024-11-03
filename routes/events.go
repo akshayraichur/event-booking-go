@@ -23,7 +23,6 @@ func getEvents(context *gin.Context) {
 }
 
 func createEvent(context *gin.Context) {
-
 	var event models.Event
 	fmt.Println("Checking this")
 
@@ -36,8 +35,6 @@ func createEvent(context *gin.Context) {
 		return
 	}
 
-	event.ID = 1
-	event.UserID = 1
 	err = event.Save()
 
 	if err != nil {
@@ -68,6 +65,7 @@ func getEvent(context *gin.Context) {
 func updateEvent(context *gin.Context) {
 
 	eventId := context.Param("id")
+	fmt.Println(eventId)
 	eventID, err := strconv.ParseInt(eventId, 10, 64)
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "could not parse event id"})

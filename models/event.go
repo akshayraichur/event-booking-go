@@ -15,10 +15,7 @@ type Event struct {
 	UserID      int       `json:"userId"`
 }
 
-var events = []Event{}
-
-
-func (event Event)Save() error {
+func (event *Event) Save() error {
 	// save event to database
 
 	query := `
@@ -41,6 +38,8 @@ func (event Event)Save() error {
 		return err
 	}
 	event.ID = id
+
+	// TODO: attach userId here
 
 	return nil
 }

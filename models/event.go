@@ -108,3 +108,25 @@ func (event Event) UpdateEvent() error {
 
 	return nil
 }
+
+func (event Event) DeleteEvent() error {
+	// delete event from database
+
+	query := `DELETE FROM events WHERE id = ?;` // ? is a placeholder for the actual values that we will pass in later
+
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close() // close the statement after the function ends to free up resources 
+
+	_, error := stmt.Exec(event.ID) // passing in the actual values for the placeholders in the query
+	if error != nil {
+		return error
+	}
+
+	return nil
+
+
+}

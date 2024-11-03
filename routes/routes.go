@@ -9,16 +9,17 @@ import (
 func RegisterRoutes(server *gin.Engine) {
 	fmt.Println("Registering routes")
 	
-
 	server.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
 		})
 	})
 
-	server.GET("/events", GetEvents)
-	server.GET("/events/:id", GetEvent)
+	server.GET("/events", getEvents)
+	server.GET("/events/:id", getEvent)
 
-	server.POST("/events", CreateEvent)
+	server.POST("/events", createEvent)
+
+	server.PUT("/events/:id", updateEvent)
 	
 }

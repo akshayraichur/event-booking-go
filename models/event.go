@@ -7,12 +7,12 @@ import (
 )
 
 type Event struct {
-	ID          int64       `json:"id"`
+	ID          int64     `json:"id"`
 	Name        string    `json:"name" binding:"required"`
 	Description string    `json:"description" binding:"required"`
 	Location    string    `json:"location" binding:"required"`
 	DateTime    time.Time `json:"date"`
-	UserID      int64       `json:"userId"`
+	UserID      int64     `json:"userId"`
 }
 
 func (event *Event) Save() error {
@@ -27,13 +27,13 @@ func (event *Event) Save() error {
 		return err
 	}
 
-	defer stmt.Close() // close the statement after the function ends to free up resources 
+	defer stmt.Close() // close the statement after the function ends to free up resources
 
 	result, error := stmt.Exec(event.Name, event.Description, event.Location, event.DateTime, event.UserID) // passing in the actual values for the placeholders in the query
 	if error != nil {
 		return error
 	}
-	id , err := result.LastInsertId()
+	id, err := result.LastInsertId()
 	if err != nil {
 		return err
 	}
@@ -50,7 +50,7 @@ func GetAllEvents() ([]Event, error) {
 	query := `SELECT * FROM events;`
 	rows, err := db.DB.Query(query) // query the database and get all the events from the events table
 	if err != nil {
-		return nil , err
+		return nil, err
 	}
 
 	defer rows.Close() // close the rows after the function ends to free up resources
@@ -73,11 +73,11 @@ func GetEventById(id int64) (*Event, error) {
 	// get event by id from database
 
 	query := `SELECT * FROM events WHERE id = ?;` // ? is a placeholder for the actual values that we will pass in later, this is to prevent SQL injection attacks
-	row := db.DB.QueryRow(query, id) // query the database and get the event with the id from the events table
-	
+	row := db.DB.QueryRow(query, id)              // query the database and get the event with the id from the events table
+
 	var event Event
 	err := row.Scan(&event.ID, &event.Name, &event.Description, &event.Location, &event.DateTime, &event.UserID) // scan the row and assign the values to the event struct, the order of the values should match the order of the columns in the query & pointer to the struct fields
-	
+
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (event Event) UpdateEvent() error {
 		return err
 	}
 
-	defer stmt.Close() // close the statement after the function ends to free up resources 
+	defer stmt.Close() // close the statement after the function ends to free up resources
 
 	_, error := stmt.Exec(event.Name, event.Description, event.Location, event.DateTime, event.UserID, event.ID) // passing in the actual values for the placeholders in the query
 	if error != nil {
@@ -118,7 +118,7 @@ func (event Event) DeleteEvent() error {
 		return err
 	}
 
-	defer stmt.Close() // close the statement after the function ends to free up resources 
+	defer stmt.Close() // close the statement after the function ends to free up resources
 
 	_, error := stmt.Exec(event.ID) // passing in the actual values for the placeholders in the query
 	if error != nil {
@@ -126,6 +126,5 @@ func (event Event) DeleteEvent() error {
 	}
 
 	return nil
-
 
 }

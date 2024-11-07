@@ -21,12 +21,10 @@ func Authenticate(context *gin.Context) {
 
 		userID, err := utils.VerifyToken(token)
 		if err != nil {
-			fmt.Println("Error: ", err)
 			context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			return
 		}
 
-		// callbackFunction(context, userID)
 		context.Set("userID", userID)
 		context.Next()
 	}

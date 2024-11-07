@@ -50,7 +50,7 @@ func (user User) Save() error {
 
 }
 
-func (user User) Authenticate() error {
+func (user *User) Authenticate() error {
 	// authenticate user
 
 	query := `

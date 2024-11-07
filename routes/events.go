@@ -24,7 +24,6 @@ func getEvents(context *gin.Context) {
 
 func createEvent(context *gin.Context) {
 	var event models.Event
-	fmt.Println("Checking this")
 
 	// ShouldBindJSON is a helper function in gin that binds the request body to a struct
 
@@ -34,6 +33,10 @@ func createEvent(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	userID := context.GetInt64("userID")
+
+	event.UserID = userID
 
 	err = event.Save()
 

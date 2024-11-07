@@ -2,9 +2,8 @@ package routes
 
 import (
 	"fmt"
-	"net/http"
 
-	"akshayraichur.com/event-booking-go/utils"
+	"akshayraichur.com/event-booking-go/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,33 +19,14 @@ func RegisterRoutes(server *gin.Engine) {
 	server.GET("/events", getEvents)
 	server.GET("/events/:id", getEvent)
 
-	server.POST("/events", protectedRoutes(createEvent))
-
-	server.PUT("/events/:id", protectedRoutes(updateEvent))
-
-	server.DELETE("/events/:id", protectedRoutes(deleteEvent))
+	authenticated := server.Group("/")
+	authenticated.Use(middlewares.Authenticate)
+	authenticated.POST("/events", createEvent)
+	authenticated.PUT("/events/:id", updateEvent)
+	authenticated.DELETE("/events/:id", deleteEvent)
 
 	// User routes
 	server.POST("/signup", signUp)
 	server.POST("/login", login)
 	
-}
-
-func protectedRoutes(callbackFunction func(context *gin.Context)) gin.HandlerFunc {
-	return func(context *gin.Context) {
-		token := context.Request.Header.Get("Authorization")
-
-		if token == "" {
-			context.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-			return
-		}
-
-		err := utils.VerifyToken(token)
-		if err != nil {
-			context.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-			return
-		}
-
-		callbackFunction(context)
-	}
 }

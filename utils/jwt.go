@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -9,7 +10,7 @@ import (
 
 const secretKey = "secretKey"
 
-func GenerateToken(email, userID string) (string, error) {
+func GenerateToken(email string, userID int64) (string, error) {
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": email,
 		"userId": userID,
@@ -19,7 +20,7 @@ func GenerateToken(email, userID string) (string, error) {
 	return jwtToken.SignedString([]byte(secretKey))
 }
 
-func VerifyToken(token string) error {
+func VerifyToken(token string) (int64, error) {
 	// verify token
 	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (any, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC) // type checking syntax
@@ -31,22 +32,28 @@ func VerifyToken(token string) error {
 	})
 
 	if err != nil {
-		return errors.New("Invalid token")
+		return 0, errors.New("Invalid token")
 	}
 
 	if !parsedToken.Valid {
-		return errors.New("Invalid token")
+		return 0, errors.New("Invalid token")
 	}
 
-	// claims, ok := parsedToken.Claims.(jwt.MapClaims) // type assertion syntax
+	claims, ok := parsedToken.Claims.(jwt.MapClaims) // type assertion syntax
 
-	// if !ok{
-	// 	return errors.New("Invalid token")
-	// }
+	if !ok{
+		return 0, errors.New("Invalid token")
+	}
 
 	// email := claims["email"].(string)
-	// userID := claims["userId"].(int64)
+	userID := int64(claims["userId"].(float64))
 
-	return nil
+	if err != nil {
+		fmt.Println("Error converting str to int64")
+		return 0, errors.New("Err converting str to int")
+	}
+	fmt.Println("User id: ", userID)
+
+	return userID, nil
 
 }

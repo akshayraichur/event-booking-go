@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -67,7 +66,7 @@ func getEvent(context *gin.Context) {
 
 func updateEvent(context *gin.Context) {
 	eventId := context.Param("id")
-	fmt.Println(eventId)
+	
 	eventID, err := strconv.ParseInt(eventId, 10, 64)
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "could not parse event id"})
@@ -80,8 +79,6 @@ func updateEvent(context *gin.Context) {
 		return
 	}
 	userID := context.GetInt64("userID")
-	fmt.Println("Event details: ", event, event.UserID)
-	fmt.Println("user id: ", userID)
 
 	if event.UserID != userID {
 		context.JSON(http.StatusBadRequest, gin.H{ "message": "Not authorized to update"})
@@ -119,6 +116,12 @@ func deleteEvent(context *gin.Context) {
 		return
 	}
 	context.JSON(http.StatusOK, event)
+	userID := context.GetInt64("userID")
+
+if event.UserID != userID {
+		context.JSON(http.StatusBadRequest, gin.H{ "message": "Not authorized to update"})
+		return;
+	}
 
 	err = event.DeleteEvent()
 	if err != nil {
